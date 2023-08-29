@@ -6,19 +6,38 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { auth } from "../../firebase";
+import { useRouter } from "next/router";
 
 const Login: React.FC = () => {
   const [login, setLogin] = useState<"login" | "cadastro">("login");
+  const [messageError, setMessageError] = useState("");
+  const [message, setMessage] = useState("");
 
   const [nome, setNome] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
 
+  const router = useRouter();
+
   async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (email === "" || password === "") {
+      let msg = `Email ou Password Invalido!`;
+      setMessageError(msg);
+
+      setInterval(() => {
+        setMessageError("");
+      }, 3000);
+      return;
+    }
     await signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
+        console.log(`Login Realizado com sucesso! ${user.email}`);
+        setNome("");
+        setEmail("");
+        setPassword("");
+        router.push("https://github.com/DarlanDuarte");
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -28,10 +47,23 @@ const Login: React.FC = () => {
 
   async function handleCadastro(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (nome === "" || email === "" || password === "") {
+      let msg = `Credenciais invalidas`;
+      setMessageError(msg);
+      setInterval(() => {
+        setMessageError("");
+      }, 3000);
+      return;
+    }
 
     await createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
+        console.log(`Cadastro Realizado com sucesso! ${user.email}`);
+        setNome("");
+        setEmail("");
+        setPassword("");
+        setLogin("login");
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -89,6 +121,7 @@ const Login: React.FC = () => {
                     placeholder="Email"
                   />
                 </div>
+
                 <div
                   className={`w-full flex flex-col text-black font-medium text-xl px-5`}
                 >
@@ -99,13 +132,20 @@ const Login: React.FC = () => {
                     type="password"
                     id="password"
                     name="password"
-                    className={`py-2 px-2 border-2 bg-slate-100 rounded-lg outline-none`}
-                    required
+                    className={`py-2 px-2 border-2 bg-slate-100 rounded-lg outline-none `}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Senha"
+                    required
                   />
                 </div>
+                <div
+                  className={`text-white font-semibold text-center mx-5 mt-2 bg-red-400 
+                  ${messageError !== "" ? "visible" : "hidden"} rounded-md`}
+                >
+                  {messageError}
+                </div>
+
                 <div
                   className={`flex justify-center items-center p-5 cursor-pointer mt-10 m-auto w-[75%] bg-[#4b83ff] h-10 rounded-lg transition-all duration-500
                   hover:bg-green-500
@@ -235,11 +275,17 @@ const Login: React.FC = () => {
                     id="password"
                     name="password"
                     className={`py-2 px-2 border-2 bg-slate-100 rounded-lg outline-none`}
-                    required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Senha"
+                    required
                   />
+                </div>
+                <div
+                  className={`text-white font-semibold text-center mx-5 mt-2 bg-red-400 
+                  ${messageError !== "" ? "visible" : "hidden"} rounded-md`}
+                >
+                  {messageError}
                 </div>
                 <div
                   className={`flex justify-center items-center p-5 cursor-pointer mt-10 m-auto w-[75%]  bg-[#4b83ff] h-10 rounded-lg transition-all duration-500
