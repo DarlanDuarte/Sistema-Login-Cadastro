@@ -1,6 +1,11 @@
 import react, { useState } from "react";
 import { BiSolidUserCircle } from "react-icons/bi";
 import { motion } from "framer-motion";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { auth } from "../../firebase";
 
 const Login: React.FC = () => {
   const [login, setLogin] = useState<"login" | "cadastro">("login");
@@ -9,8 +14,29 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
 
-  async function handleForm(e: React.FormEvent<HTMLFormElement>) {
+  async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    await signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+      });
+  }
+
+  async function handleCadastro(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    await createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+      });
   }
 
   async function handleChangeLogin(
@@ -29,7 +55,7 @@ const Login: React.FC = () => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "-100%" }}
             transition={{ duration: 1 }}
-            className={`w-[40%] h-[42rem] bg-white absolute -top-[35%] left-10 z-10 shadow-xl  `}
+            className={`w-[40%] h-[42rem] bg-white absolute -top-[28%] left-10 z-10 shadow-2xl rounded-xl  `}
           >
             <div className={"relative  -top-16"}>
               <BiSolidUserCircle
@@ -45,22 +71,22 @@ const Login: React.FC = () => {
               >
                 Login
               </h2>
-              <form onSubmit={handleForm}>
+              <form onSubmit={handleLogin}>
                 <div
                   className={`w-full flex flex-col text-black font-medium text-xl px-5`}
                 >
-                  <label className="mb-1" htmlFor="nome">
-                    Nome:
+                  <label className="mb-1" htmlFor="email">
+                    Email:
                   </label>
                   <input
                     type="text"
-                    id="nome"
-                    name="nome"
+                    id="email"
+                    name="email"
                     className={`py-2 px-2 border-2 bg-slate-100 rounded-lg outline-none`}
                     required
-                    value={nome}
-                    onChange={(e) => setNome(e.target.value)}
-                    placeholder="Digite seu Nome"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Email"
                   />
                 </div>
                 <div
@@ -77,13 +103,18 @@ const Login: React.FC = () => {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Digite sua Senha"
+                    placeholder="Senha"
                   />
                 </div>
                 <div
-                  className={`flex justify-center items-center p-5 cursor-pointer mt-10 m-auto w-[75%] bg-[#4b83ff] h-10 rounded-lg`}
+                  className={`flex justify-center items-center p-5 cursor-pointer mt-10 m-auto w-[75%] bg-[#4b83ff] h-10 rounded-lg transition-all duration-500
+                  hover:bg-green-500
+                  `}
                 >
-                  <button className={`text-white font-semibold text-xl`}>
+                  <button
+                    className={`text-white font-semibold text-xl 
+                  `}
+                  >
                     Entrar
                   </button>
                 </div>
@@ -103,7 +134,9 @@ const Login: React.FC = () => {
                 onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) =>
                   handleChangeLogin(e)
                 }
-                className={`text-white font-semibold text-2xl bg-[#3D3D65] h-44 w-44 rounded-full`}
+                className={`text-white font-semibold text-2xl bg-[#3D3D65] h-44 w-44 rounded-full transition-all duration-500
+                hover:bg-blue-900
+                `}
               >
                 Cadastrar
               </button>
@@ -124,7 +157,10 @@ const Login: React.FC = () => {
                 onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) =>
                   handleChangeLogin(e)
                 }
-                className={`text-white font-semibold text-2xl bg-[#3D3D65] h-44 w-44 rounded-full`}
+                className={`text-white font-semibold text-2xl bg-[#3D3D65] h-44 w-44 rounded-full 
+                transition-all duration-500
+                hover:bg-blue-900
+                `}
               >
                 Login
               </button>
@@ -137,7 +173,7 @@ const Login: React.FC = () => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "100%" }}
             transition={{ duration: 1 }}
-            className={`w-[40%] h-[42rem] bg-white absolute -top-[35%] right-10 z-10 shadow-xl  `}
+            className={`w-[40%] h-[42rem] bg-white absolute -top-[28%] right-10 z-10 shadow-2xl rounded-xl  `}
           >
             <div className={"relative  -top-16"}>
               <BiSolidUserCircle
@@ -153,7 +189,7 @@ const Login: React.FC = () => {
               >
                 Cadastro
               </h2>
-              <form onSubmit={handleForm}>
+              <form onSubmit={handleCadastro}>
                 <div
                   className={`w-full flex flex-col text-black font-medium text-xl px-5`}
                 >
@@ -206,7 +242,9 @@ const Login: React.FC = () => {
                   />
                 </div>
                 <div
-                  className={`flex justify-center items-center p-5 cursor-pointer mt-10 m-auto w-[75%]  bg-[#4b83ff] h-10 rounded-lg`}
+                  className={`flex justify-center items-center p-5 cursor-pointer mt-10 m-auto w-[75%]  bg-[#4b83ff] h-10 rounded-lg transition-all duration-500
+                  hover:bg-green-500
+                  `}
                 >
                   <button className={`text-white font-semibold text-xl`}>
                     Cadastrar
